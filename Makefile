@@ -1,4 +1,4 @@
-PROJECT:=go-admin
+PROJECT:=openstack-admin
 
 .PHONY: build
 build:
@@ -52,3 +52,7 @@ deploy:
 	#@git pull origin master
 	make build-linux
 	make run
+	
+# server on local
+server:
+	./go-admin server -c config/settings-dev.yml     
