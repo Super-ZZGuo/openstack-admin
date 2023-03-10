@@ -55,4 +55,7 @@ deploy:
 	
 # server on local
 server:
-	./go-admin server -c config/settings-dev.yml     
+	./go-admin server -c config/settings-dev.yml
+
+migrate:
+	./go-admin migrate -c config/settings-dev.yml
