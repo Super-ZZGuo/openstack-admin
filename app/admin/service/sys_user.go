@@ -248,7 +248,7 @@ func (e *SysUser) UpdatePwd(id int, oldPassword, newPassword string, p *actions.
 	return nil
 }
 
-func (e *SysUser) GetProfile(c *dto.SysUserById, user *models.SysUser, roles *[]models.SysRole, posts *[]models.SysPost) error {
+func (e *SysUser) GetProfile(c *dto.SysUserById, user *models.SysUser, roles *[]models.SysRole) error { //, posts *[]models.SysPost
 	err := e.Orm.Preload("Dept").First(user, c.GetId()).Error
 	if err != nil {
 		return err
@@ -257,10 +257,10 @@ func (e *SysUser) GetProfile(c *dto.SysUserById, user *models.SysUser, roles *[]
 	if err != nil {
 		return err
 	}
-	err = e.Orm.Find(posts, user.PostIds).Error
-	if err != nil {
-		return err
-	}
+	// err = e.Orm.Find(posts, user.PostIds).Error
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

@@ -1,10 +1,11 @@
 package apis
 
 import (
-	"github.com/gin-gonic/gin/binding"
 	"go-admin/app/admin/models"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+
+	"github.com/gin-gonic/gin/binding"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -385,8 +386,8 @@ func (e SysUser) GetProfile(c *gin.Context) {
 
 	sysUser := models.SysUser{}
 	roles := make([]models.SysRole, 0)
-	posts := make([]models.SysPost, 0)
-	err = s.GetProfile(&req, &sysUser, &roles, &posts)
+	// posts := make([]models.SysPost, 0)
+	err = s.GetProfile(&req, &sysUser, &roles) //, &posts
 	if err != nil {
 		e.Logger.Errorf("get user profile error, %s", err.Error())
 		e.Error(500, err, "获取用户信息失败")
@@ -395,7 +396,7 @@ func (e SysUser) GetProfile(c *gin.Context) {
 	e.OK(gin.H{
 		"user":  sysUser,
 		"roles": roles,
-		"posts": posts,
+		// "posts": posts,
 	}, "查询成功")
 }
 

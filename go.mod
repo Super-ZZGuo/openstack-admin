@@ -13,6 +13,7 @@ require (
 	github.com/go-admin-team/go-admin-core v1.4.1-0.20220809101213-21187928f7d9
 	github.com/go-admin-team/go-admin-core/sdk v1.4.1-0.20220809101213-21187928f7d9
 	github.com/google/uuid v1.3.0
+	github.com/gophercloud/gophercloud v1.2.0
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.21.12+incompatible
 	github.com/mssola/user_agent v0.5.2
 	github.com/opentracing/opentracing-go v1.1.0
@@ -26,7 +27,7 @@ require (
 	github.com/swaggo/gin-swagger v1.5.0
 	github.com/swaggo/swag v1.8.3
 	github.com/unrolled/secure v1.0.8
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 	gorm.io/driver/mysql v1.3.5
 	gorm.io/driver/postgres v1.3.8
 	gorm.io/driver/sqlite v1.3.6
@@ -47,6 +48,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chanxuehong/rand v0.0.0-20201110082127-2f19a1bdd973 // indirect
 	github.com/chanxuehong/wechat v0.0.0-20201110083048-0180211b69fd // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.9.0 // indirect
@@ -110,7 +112,9 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/robinjoseph08/redisqueue/v2 v2.1.0 // indirect
+	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shamsher31/goimgext v1.0.0 // indirect
+	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
