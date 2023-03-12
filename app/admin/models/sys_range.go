@@ -6,6 +6,8 @@ import (
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/remoteconsoles"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
 type SysRange struct {
@@ -15,7 +17,8 @@ type SysRange struct {
 	Status           string `json:"status" gorm:"type:varchar(10);comment:Status"`
 	Image            string `json:"image" gorm:"type:varchar(100);comment:Image"`
 	Flavor           string `json:"flavor" gorm:"type:varchar(100);comment:Flavor"`
-	RangeOpenstackID string `json:"rangeOpenstackID" gorm:"type:varchar(100);comment:RangeOpenstackID"`
+	RangeOpenstackId string `json:"rangeOpenstackId" gorm:"type:varchar(100);comment:RangeOpenstackID"`
+	RangeConsole     string `json:"rangeConsole" gorm:"-"`
 	models.ModelTime
 	models.ControlBy
 }
@@ -56,6 +59,56 @@ func CreateComputeClient() *gophercloud.ServiceClient {
 	client, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{})
 	if err != nil {
 		fmt.Printf("openstack create compute client error:%s \r\n", err)
+		return nil
 	}
 	return client
+}
+
+func RemoteConsole(computeClient *gophercloud.ServiceClient, serverID string) string {
+	computeClient.Microversion = "2.6"
+	createOpts := remoteconsoles.CreateOpts{
+		Protocol: remoteconsoles.ConsoleProtocolVNC,
+		Type:     remoteconsoles.ConsoleTypeNoVNC,
+	}
+
+	remtoteConsole, err := remoteconsoles.Create(computeClient, serverID, createOpts).Extract()
+	if err != nil {
+		fmt.Printf("openstack get remote console error:%s \r\n", err)
+		return ""
+	}
+
+	return remtoteConsole.URL
+}
+
+func ServerList(client *gophercloud.ServiceClient, name string) []servers.Server {
+	opts := servers.ListOpts{
+		Name: name,
+	}
+
+	allPage, err := servers.List(client, opts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack get server list error:%s \r\n", err)
+		return nil
+	}
+
+	allServes, err := servers.ExtractServers(allPage)
+	if err != nil {
+		fmt.Printf("openstack get server list error:%s \r\n", err)
+		return nil
+	}
+	return allServes
+}
+
+func UpateServer(client *gophercloud.ServiceClient, name string, serverID string, ImageRef string) error {
+	rebuildOpts := servers.RebuildOpts{
+		Name:     name,
+		ImageRef: ImageRef,
+	}
+
+	_, err := servers.Rebuild(client, serverID, rebuildOpts).Extract()
+	if err != nil {
+		fmt.Printf("openstack update server error:%s \r\n", err)
+		return err
+	}
+	return nil
 }

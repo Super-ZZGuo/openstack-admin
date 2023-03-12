@@ -23,7 +23,7 @@ type SysRangeOrder struct {
 	CreatedAt        string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_range"`
 	UpdatedAt        string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_range"`
 	DeletedAt        string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_range"`
-	RangeOpenstackID string `form:"rangeOpenstackIDOrder"  search:"type:order;column:range_openstack_ID;table:sys_range"`
+	RangeOpenstackId string `form:"rangeOpenstackIdOrder"  search:"type:order;column:range_openstack_ID;table:sys_range"`
 }
 
 func (m *SysRangeGetPageReq) GetNeedSearch() interface{} {
@@ -37,7 +37,7 @@ type SysRangeInsertReq struct {
 	Status           string `json:"status" comment:""`
 	Image            string `json:"image" comment:""`
 	Flavor           string `json:"flavor" comment:""`
-	RangeOpenstackID string `json:"rangeOpenstackID" comment:""`
+	RangeOpenstackId string `json:"-" comment:""`
 	common.ControlBy
 }
 
@@ -51,7 +51,7 @@ func (s *SysRangeInsertReq) Generate(model *models.SysRange) {
 	model.Image = s.Image
 	model.Flavor = s.Flavor
 	model.CreateBy = s.CreateBy // 添加这而，需要记录是被谁创建的
-	model.RangeOpenstackID = s.RangeOpenstackID
+	model.RangeOpenstackId = s.RangeOpenstackId
 }
 
 func (s *SysRangeInsertReq) GetId() interface{} {
@@ -59,13 +59,10 @@ func (s *SysRangeInsertReq) GetId() interface{} {
 }
 
 type SysRangeUpdateReq struct {
-	RangeId          int    `uri:"rangeId" comment:""` //
-	TenantName       string `json:"tenantName" comment:""`
+	RangeId          int    `uri:"rangeId" comment:""`
 	RangeName        string `json:"rangeName" comment:""`
-	Status           string `json:"status" comment:""`
 	Image            string `json:"image" comment:""`
-	Flavor           string `json:"flavor" comment:""`
-	RangeOpenstackID string `json:"rangeOpenstackID" comment:""`
+	RangeOpenstackId string `json:"rangeOpenstackId" comment:""`
 	common.ControlBy
 }
 
@@ -73,13 +70,10 @@ func (s *SysRangeUpdateReq) Generate(model *models.SysRange) {
 	if s.RangeId == 0 {
 		model.RangeId = s.RangeId
 	}
-	model.TenantName = s.TenantName
 	model.RangeName = s.RangeName
-	model.Status = s.Status
 	model.Image = s.Image
-	model.Flavor = s.Flavor
 	model.UpdateBy = s.UpdateBy // 添加这而，需要记录是被谁更新的
-	model.RangeOpenstackID = s.RangeOpenstackID
+	model.RangeOpenstackId = s.RangeOpenstackId
 }
 
 func (s *SysRangeUpdateReq) GetId() interface{} {
@@ -88,7 +82,7 @@ func (s *SysRangeUpdateReq) GetId() interface{} {
 
 // SysRangeGetReq 功能获取请求参数
 type SysRangeGetReq struct {
-	RangeId int `uri:"rangeId"`
+	RangeId int `uri:"id"`
 }
 
 func (s *SysRangeGetReq) GetId() interface{} {
@@ -98,11 +92,11 @@ func (s *SysRangeGetReq) GetId() interface{} {
 // SysRangeDeleteReq 功能删除请求参数
 type SysRangeDeleteReq struct {
 	Ids              []int    `json:"ids"`
-	RangeOpenstackID []string `json:"rangeOpenstackID" comment:""`
+	RangeOpenstackId []string `json:"rangeOpenstackId" comment:""`
 }
 
 func (s *SysRangeDeleteReq) GetOpenstackId() interface{} {
-	return s.RangeOpenstackID
+	return s.RangeOpenstackId
 }
 
 func (s *SysRangeDeleteReq) GetId() interface{} {

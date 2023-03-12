@@ -85,6 +85,8 @@ func (e SysRange) Get(c *gin.Context) {
 		e.Error(500, err, fmt.Sprintf("获取SysRange失败，\r\n失败信息 %s", err.Error()))
 		return
 	}
+	client := models.CreateComputeClient()
+	object.RangeConsole = models.RemoteConsole(client, object.RangeOpenstackId)
 
 	e.OK(object, "查询成功")
 }
@@ -125,6 +127,7 @@ func (e SysRange) Insert(c *gin.Context) {
 		return
 	}
 
+	req.RangeOpenstackId = models.ServerList(client, req.RangeName)[0].ID
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
 
@@ -164,6 +167,13 @@ func (e SysRange) Update(c *gin.Context) {
 	req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
 
+	client := models.CreateComputeClient()
+	err = models.UpateServer(client, req.RangeName, req.RangeOpenstackId, req.Image)
+	if err != nil {
+		e.Error(500, err, fmt.Sprintf("修改SysRange失败，\r\n失败信息 %s", err.Error()))
+		return
+	}
+
 	err = s.Update(&req, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("修改SysRange失败，\r\n失败信息 %s", err.Error()))
@@ -194,7 +204,7 @@ func (e SysRange) Delete(c *gin.Context) {
 		return
 	}
 	client := models.CreateComputeClient()
-	for _, serverID := range req.RangeOpenstackID {
+	for _, serverID := range req.RangeOpenstackId {
 		servers.Delete(client, serverID)
 	}
 
