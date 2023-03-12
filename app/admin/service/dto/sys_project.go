@@ -50,10 +50,12 @@ func (s *SysProjectInsertReq) GetId() interface{} {
 }
 
 type SysProjectUpdateReq struct {
-	ProjectId          int    `uri:"projectId" comment:""` //
-	ProjectName        string `json:"projectName" comment:""`
-	Tag                string `json:"tag" comment:""`
-	ProjectOpenstackId string `json:"projectOpenstackId" comment:""`
+	ProjectId          int    `uri:"id" comment:""` //
+	NewProjectName     string `json:"newProjectName" comment:""`
+	OldProjectName     string `json:"oldProjectName" comment:""`
+	OldTag             string `json:"oldTag" comment:""`
+	NewTag             string `json:"newTag" comment:""`
+	ProjectOpenstackId string `json:"-" comment:""`
 	common.ControlBy
 }
 
@@ -61,8 +63,14 @@ func (s *SysProjectUpdateReq) Generate(model *models.SysProject) {
 	if s.ProjectId == 0 {
 		model.ProjectId = s.ProjectId
 	}
-	model.ProjectName = s.ProjectName
-	model.Tag = s.Tag
+	model.ProjectName = s.NewProjectName
+	if s.NewTag == "" && s.OldTag != "" {
+		model.Tag = s.OldTag
+	}
+	if s.NewTag != "" {
+		model.Tag = s.NewTag
+	}
+
 	model.ProjectOpenstackId = s.ProjectOpenstackId
 	model.UpdateBy = s.UpdateBy // 添加这而，需要记录是被谁更新的
 }
@@ -82,7 +90,8 @@ func (s *SysProjectGetReq) GetId() interface{} {
 
 // SysProjectDeleteReq 功能删除请求参数
 type SysProjectDeleteReq struct {
-	Ids []int `json:"ids"`
+	Ids         []int  `json:"ids"`
+	ProjectName string `json:"projectName" comment:""`
 }
 
 func (s *SysProjectDeleteReq) GetId() interface{} {

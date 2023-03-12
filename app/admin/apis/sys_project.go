@@ -1,7 +1,7 @@
 package apis
 
 import (
-    "fmt"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -28,18 +28,18 @@ type SysProject struct {
 // @Router /api/v1/sys-project [get]
 // @Security Bearer
 func (e SysProject) GetPage(c *gin.Context) {
-    req := dto.SysProjectGetPageReq{}
-    s := service.SysProject{}
-    err := e.MakeContext(c).
-        MakeOrm().
-        Bind(&req).
-        MakeService(&s.Service).
-        Errors
-   	if err != nil {
-   		e.Logger.Error(err)
-   		e.Error(500, err, err.Error())
-   		return
-   	}
+	req := dto.SysProjectGetPageReq{}
+	s := service.SysProject{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 
 	p := actions.GetPermissionFromContext(c)
 	list := make([]models.SysProject, 0)
@@ -48,7 +48,7 @@ func (e SysProject) GetPage(c *gin.Context) {
 	err = s.GetPage(&req, p, &list, &count)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("获取SysProject失败，\r\n失败信息 %s", err.Error()))
-        return
+		return
 	}
 
 	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
@@ -65,7 +65,7 @@ func (e SysProject) GetPage(c *gin.Context) {
 func (e SysProject) Get(c *gin.Context) {
 	req := dto.SysProjectGetReq{}
 	s := service.SysProject{}
-    err := e.MakeContext(c).
+	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).
 		MakeService(&s.Service).
@@ -81,10 +81,10 @@ func (e SysProject) Get(c *gin.Context) {
 	err = s.Get(&req, p, &object)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("获取SysProject失败，\r\n失败信息 %s", err.Error()))
-        return
+		return
 	}
 
-	e.OK( object, "查询成功")
+	e.OK(object, "查询成功")
 }
 
 // Insert 创建SysProject
@@ -98,25 +98,32 @@ func (e SysProject) Get(c *gin.Context) {
 // @Router /api/v1/sys-project [post]
 // @Security Bearer
 func (e SysProject) Insert(c *gin.Context) {
-    req := dto.SysProjectInsertReq{}
-    s := service.SysProject{}
-    err := e.MakeContext(c).
-        MakeOrm().
-        Bind(&req).
-        MakeService(&s.Service).
-        Errors
-    if err != nil {
-        e.Logger.Error(err)
-        e.Error(500, err, err.Error())
-        return
-    }
+	req := dto.SysProjectInsertReq{}
+	s := service.SysProject{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
+
+	client := models.CreateIdentityClient(models.CreateIdentityProvider("admin"))
+	_, err = models.CreateProject(client, req.ProjectName, req.Tag)
+	if err != nil {
+		return
+	}
+	req.ProjectOpenstackId = models.GetProjectId(client, req.ProjectName)
 
 	err = s.Insert(&req)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("创建SysProject失败，\r\n失败信息 %s", err.Error()))
-        return
+		return
 	}
 
 	e.OK(req.GetId(), "创建成功")
@@ -134,27 +141,35 @@ func (e SysProject) Insert(c *gin.Context) {
 // @Router /api/v1/sys-project/{id} [put]
 // @Security Bearer
 func (e SysProject) Update(c *gin.Context) {
-    req := dto.SysProjectUpdateReq{}
-    s := service.SysProject{}
-    err := e.MakeContext(c).
-        MakeOrm().
-        Bind(&req).
-        MakeService(&s.Service).
-        Errors
-    if err != nil {
-        e.Logger.Error(err)
-        e.Error(500, err, err.Error())
-        return
-    }
+	req := dto.SysProjectUpdateReq{}
+	s := service.SysProject{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 	req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
+
+	client := models.CreateIdentityClient(models.CreateIdentityProvider(req.OldProjectName))
+	req.ProjectOpenstackId = models.GetProjectId(client, req.OldProjectName)
+	_, err = models.UpateProject(client, req.NewProjectName, req.OldProjectName)
+	if err != nil {
+		return
+	}
 
 	err = s.Update(&req, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("修改SysProject失败，\r\n失败信息 %s", err.Error()))
-        return
+		return
 	}
-	e.OK( req.GetId(), "修改成功")
+
+	e.OK(req.GetId(), "修改成功")
 }
 
 // Delete 删除SysProject
@@ -166,26 +181,32 @@ func (e SysProject) Update(c *gin.Context) {
 // @Router /api/v1/sys-project [delete]
 // @Security Bearer
 func (e SysProject) Delete(c *gin.Context) {
-    s := service.SysProject{}
-    req := dto.SysProjectDeleteReq{}
-    err := e.MakeContext(c).
-        MakeOrm().
-        Bind(&req).
-        MakeService(&s.Service).
-        Errors
-    if err != nil {
-        e.Logger.Error(err)
-        e.Error(500, err, err.Error())
-        return
-    }
+	s := service.SysProject{}
+	req := dto.SysProjectDeleteReq{}
+	err := e.MakeContext(c).
+		MakeOrm().
+		Bind(&req).
+		MakeService(&s.Service).
+		Errors
+	if err != nil {
+		e.Logger.Error(err)
+		e.Error(500, err, err.Error())
+		return
+	}
 
 	// req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
 
+	client := models.CreateIdentityClient(models.CreateIdentityProvider(req.ProjectName))
+	err = models.DelteProject(client, req.ProjectName)
+	if err != nil {
+		return
+	}
+
 	err = s.Remove(&req, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("删除SysProject失败，\r\n失败信息 %s", err.Error()))
-        return
+		return
 	}
-	e.OK( req.GetId(), "删除成功")
+	e.OK(req.GetId(), "删除成功")
 }
