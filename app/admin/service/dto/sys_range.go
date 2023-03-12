@@ -36,7 +36,7 @@ func (m *SysRangeGetPageReq) GetNeedSearch() interface{} {
 }
 
 type SysRangeInsertReq struct {
-	RangeId          int    `json:"rangeId" comment:""` //
+	RangeId          int    `json:"-" comment:""` //
 	TenantName       string `json:"tenantName" comment:""`
 	RangeName        string `json:"rangeName" comment:""`
 	Status           string `json:"status" comment:""`
@@ -68,7 +68,7 @@ func (s *SysRangeInsertReq) GetId() interface{} {
 }
 
 type SysRangeUpdateReq struct {
-	RangeId          int    `uri:"rangeId" comment:""`
+	RangeId          int    `uri:"id" comment:""`
 	RangeName        string `json:"rangeName" comment:""`
 	Image            string `json:"image" comment:""`
 	ProjectName      string `json:"projectName"`

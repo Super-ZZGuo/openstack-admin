@@ -40,7 +40,7 @@ func (e *SysRange) GetId() interface{} {
 }
 
 //create a new openstack cilent
-func CreateProvider(TenantName string) *gophercloud.ProviderClient {
+func CreateComputeProvider(TenantName string) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: "http://controller:5000/v3/",
 		Username:         "admin",
@@ -52,6 +52,7 @@ func CreateProvider(TenantName string) *gophercloud.ProviderClient {
 	provider, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
 		fmt.Printf("openstack create provider client error:%s \r\n", err)
+		return nil
 	}
 
 	return provider
