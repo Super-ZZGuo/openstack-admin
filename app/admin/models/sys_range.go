@@ -11,14 +11,17 @@ import (
 )
 
 type SysRange struct {
-	RangeId          int    `json:"rangeId" gorm:"primaryKey;autoIncrement;comment:rangeid"`
-	TenantName       string `json:"tenantName" gorm:"type:varchar(10);comment:TenantName"`
-	RangeName        string `json:"rangeName" gorm:"type:varchar(255);comment:RangeName"`
-	Status           string `json:"status" gorm:"type:varchar(10);comment:Status"`
-	Image            string `json:"image" gorm:"type:varchar(100);comment:Image"`
-	Flavor           string `json:"flavor" gorm:"type:varchar(100);comment:Flavor"`
-	RangeOpenstackId string `json:"rangeOpenstackId" gorm:"type:varchar(100);comment:RangeOpenstackID"`
-	RangeConsole     string `json:"rangeConsole" gorm:"-"`
+	RangeId          int         `json:"rangeId" gorm:"primaryKey;autoIncrement;comment:rangeid"`
+	TenantName       string      `json:"tenantName" gorm:"type:varchar(10);comment:TenantName"`
+	RangeName        string      `json:"rangeName" gorm:"type:varchar(255);comment:RangeName"`
+	Status           string      `json:"status" gorm:"type:varchar(10);comment:Status"`
+	Image            string      `json:"image" gorm:"type:varchar(100);comment:Image"`
+	Flavor           string      `json:"flavor" gorm:"type:varchar(100);comment:Flavor"`
+	RangeOpenstackId string      `json:"rangeOpenstackId" gorm:"type:varchar(100);comment:RangeOpenstackID"`
+	ProjectId        int         `json:"projectId" gorm:"type:bigint(20);comment:ProjectId"`
+	ProjectName      string      `json:"projectName" gorm:"type:varchar(100);comment:ProjectName"`
+	RangeConsole     string      `json:"rangeConsole" gorm:"-"`
+	Project          *SysProject `json:"project"`
 	models.ModelTime
 	models.ControlBy
 }
@@ -37,14 +40,14 @@ func (e *SysRange) GetId() interface{} {
 }
 
 //create a new openstack cilent
-func createProvider() *gophercloud.ProviderClient {
+func CreateProvider(TenantName string) *gophercloud.ProviderClient {
 	opts := gophercloud.AuthOptions{
 		IdentityEndpoint: "http://controller:5000/v3/",
 		Username:         "admin",
 		Password:         "admin",
 		DomainName:       "default",
-		TenantID:         "64335e8f232f445f8c9d5bd4402f83df",
-		TenantName:       "admin",
+		// TenantID:         "64335e8f232f445f8c9d5bd4402f83df",
+		TenantName: TenantName,
 	}
 	provider, err := openstack.AuthenticatedClient(opts)
 	if err != nil {
@@ -54,8 +57,7 @@ func createProvider() *gophercloud.ProviderClient {
 	return provider
 }
 
-func CreateComputeClient() *gophercloud.ServiceClient {
-	provider := createProvider()
+func CreateComputeClient(provider *gophercloud.ProviderClient) *gophercloud.ServiceClient {
 	client, err := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{})
 	if err != nil {
 		fmt.Printf("openstack create compute client error:%s \r\n", err)
