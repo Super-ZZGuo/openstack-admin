@@ -59,4 +59,4 @@ server:
 	./go-admin server -c config/settings.dev.yml
 
 migrate:
-	./go-admin migrate -c config/settings-dev.yml
+	./go-admin migrate -c config/settings.dev.yml
