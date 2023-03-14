@@ -72,8 +72,8 @@ func CreateProject(identityClient *gophercloud.ServiceClient, project_name strin
 	}
 
 	projectID := GetProjectId(identityClient, project_name)
-	userID := "30cc742330be41208e078641b6675f67"
-	roleID := "e177e618b3ae4d0a9f2f5dde71d87bd8"
+	userID := "68cabe91a1904b3da72959341823d3e0"
+	roleID := "d8c478fc612242a284f4b3007adafb68"
 
 	err = roles.Assign(identityClient, roleID, roles.AssignOpts{
 		UserID:    userID,

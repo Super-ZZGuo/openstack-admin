@@ -116,6 +116,7 @@ func (e SysProject) Insert(c *gin.Context) {
 	client := models.CreateIdentityClient(models.CreateIdentityProvider("admin"))
 	_, err = models.CreateProject(client, req.ProjectName, req.Tag)
 	if err != nil {
+		e.Error(500, err, err.Error())
 		return
 	}
 	req.ProjectOpenstackId = models.GetProjectId(client, req.ProjectName)
