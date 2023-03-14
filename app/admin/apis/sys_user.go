@@ -447,7 +447,7 @@ func (e SysUser) GetInfo(c *gin.Context) {
 		return
 	}
 	mp["introduction"] = " am a super administrator"
-	mp["avatar"] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+	mp["avatar"] = "/static/uploadfile/dbcd7ebc-cba7-47ca-a41b-fd05b2d44e39.jpg"
 	if sysUser.Avatar != "" {
 		mp["avatar"] = sysUser.Avatar
 	}
