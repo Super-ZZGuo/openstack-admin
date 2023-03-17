@@ -16,9 +16,9 @@ type SysUserGetPageReq struct {
 	RoleId         string `form:"roleId" search:"type:exact;column:role_id;table:sys_user" comment:"角色ID"`
 	Sex            string `form:"sex" search:"type:exact;column:sex;table:sys_user" comment:"性别"`
 	Email          string `form:"email" search:"type:contains;column:email;table:sys_user" comment:"邮箱"`
-	PostId         string `form:"postId" search:"type:exact;column:post_id;table:sys_user" comment:"岗位"`
-	Status         string `form:"status" search:"type:exact;column:status;table:sys_user" comment:"状态"`
-	DeptJoin       `search:"type:left;on:dept_id:dept_id;table:sys_user;join:sys_dept"`
+	// PostId         string `form:"postId" search:"type:exact;column:post_id;table:sys_user" comment:"岗位"`
+	Status   string `form:"status" search:"type:exact;column:status;table:sys_user" comment:"状态"`
+	DeptJoin `search:"type:left;on:dept_id:dept_id;table:sys_user;join:sys_dept"`
 	SysUserOrder
 }
 

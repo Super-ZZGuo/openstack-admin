@@ -8,12 +8,12 @@ import (
 
 type SysProjectGetPageReq struct {
 	dto.Pagination `search:"-"`
+	ProjectId      string `form:"projectId"  search:"type:exact;column:project_id;table:sys_project"`
+	ProjectName    string `form:"projectName"  search:"type:exact;column:project_name;table:sys_project"`
 	SysProjectOrder
 }
 
 type SysProjectOrder struct {
-	ProjectId          string `form:"projectIdOrder"  search:"type:order;column:project_id;table:sys_project"`
-	ProjectName        string `form:"projectNameOrder"  search:"type:order;column:project_name;table:sys_project"`
 	ProjectOpenstackId string `form:"projectOpenstackIdOrder"  search:"type:order;column:project_openstack_id;table:sys_project"`
 	Tag                string `form:"tagOrder"  search:"type:order;column:tag;table:sys_project"`
 	CreateBy           string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_project"`
