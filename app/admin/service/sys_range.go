@@ -22,7 +22,7 @@ func (e *SysRange) GetPage(c *dto.SysRangeGetPageReq, p *actions.DataPermission,
 	var err error
 	var data models.SysRange
 
-	err = e.Orm.Model(&data).
+	err = e.Orm.Model(&data).Preload("Project").
 		Scopes(
 			cDto.MakeCondition(c.GetNeedSearch()),
 			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
@@ -41,7 +41,7 @@ func (e *SysRange) GetPage(c *dto.SysRangeGetPageReq, p *actions.DataPermission,
 func (e *SysRange) Get(d *dto.SysRangeGetReq, p *actions.DataPermission, model *models.SysRange) error {
 	var data models.SysRange
 
-	err := e.Orm.Model(&data).Preload("Project").
+	err := e.Orm.Model(&data).
 		Scopes(
 			actions.Permission(data.TableName(), p),
 		).

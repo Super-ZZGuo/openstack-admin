@@ -8,6 +8,8 @@ import (
 
 type SysRangeGetPageReq struct {
 	dto.Pagination `search:"-"`
+	ProjectName    string `form:"projectName" search:"type:contains;column:project_name;table:sys_range" comment:""`
+	ProjectJoin    `search:"type:left;on:project_name:project_name;table:sys_range;join:sys_project"`
 	SysRangeOrder
 }
 
@@ -24,11 +26,10 @@ type SysRangeOrder struct {
 	CreatedAt        string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_range"`
 	UpdatedAt        string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_range"`
 	DeletedAt        string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_range"`
-	ProjectJoin      `search:"type:left;on:project_id:project_id;table:sys_project;join:sys_project"`
 }
 
 type ProjectJoin struct {
-	ProjectId string `search:"type:contains;column:project_path;table:sys_project" form:"projectId"`
+	ProjectName string `search:"type:contains;column:project_name;table:sys_project" form:"projectName"`
 }
 
 func (m *SysRangeGetPageReq) GetNeedSearch() interface{} {
