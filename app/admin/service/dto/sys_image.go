@@ -52,6 +52,8 @@ type SysImageGetUpdateReq struct {
 	ImageId      int    `uri:"id" comment:""` //
 	ImageNewName string `json:"imageNewName" comment:""`
 	ImageOldName string `json:"imageOldName" comment:""`
+	Newtag       string `json:"newTag" comment:""`
+	OldTag       string `json:"oldTag" comment:""`
 	common.ControlBy
 }
 
@@ -59,7 +61,16 @@ func (s *SysImageGetUpdateReq) Generate(model *models.SysImage) {
 	if s.ImageId == 0 {
 		model.ImageId = s.ImageId
 	}
-	model.ImageName = s.ImageNewName
+	if s.ImageNewName == "" {
+		model.ImageName = s.ImageOldName
+	} else {
+		model.ImageName = s.ImageNewName
+	}
+	if s.Newtag == "" {
+		model.ImageName = s.OldTag
+	} else {
+		model.ImageName = s.Newtag
+	}
 	model.UpdateBy = s.UpdateBy // 添加这而，需要记录是被谁更新的
 }
 
@@ -70,6 +81,7 @@ func (s *SysImageGetUpdateReq) GetId() interface{} {
 type SysImagePutUpdateReq struct {
 	ImageId   int
 	ImageName string
+	Tag       string
 	common.ControlBy
 }
 

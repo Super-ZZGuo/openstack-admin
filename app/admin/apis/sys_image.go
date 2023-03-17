@@ -138,6 +138,7 @@ func (e SysImage) Insert(c *gin.Context) {
 // @Security Bearer
 func (e SysImage) Update(c *gin.Context) {
 	req := dto.SysImageGetUpdateReq{}
+	new := dto.SysImagePutUpdateReq{}
 	s := service.SysImage{}
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -152,15 +153,24 @@ func (e SysImage) Update(c *gin.Context) {
 	req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
 
-	client := models.CreateImageClient(models.CreateImageProvider("admin"))
-	err = models.UpadteImage(client, req.ImageNewName, models.GetImageId(client, req.ImageOldName))
-	if err != nil {
-		e.Error(500, err, fmt.Sprintf("修改SysImage失败，\r\n失败信息 %s", err.Error()))
-		return
-	}
-	new := dto.SysImagePutUpdateReq{}
 	new.ImageId = req.ImageId
-	new.ImageName = req.ImageNewName
+	if req.ImageNewName != "" {
+		client := models.CreateImageClient(models.CreateImageProvider("admin"))
+		err = models.UpadteImage(client, req.ImageNewName, models.GetImageId(client, req.ImageOldName))
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("修改SysImage失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+		new.ImageName = req.ImageNewName
+	} else {
+		new.ImageName = req.ImageOldName
+	}
+	if req.Newtag != "" {
+		new.Tag = req.Newtag
+	} else {
+		new.Tag = req.OldTag
+	}
+
 	err = s.Update(&new, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("修改SysImage失败，\r\n失败信息 %s", err.Error()))
