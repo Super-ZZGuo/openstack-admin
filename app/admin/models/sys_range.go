@@ -12,7 +12,6 @@ import (
 
 type SysRange struct {
 	RangeId          int         `json:"rangeId" gorm:"primaryKey;autoIncrement;comment:rangeid"`
-	TenantName       string      `json:"tenantName" gorm:"type:varchar(10);comment:TenantName"`
 	RangeName        string      `json:"rangeName" gorm:"type:varchar(255);comment:RangeName"`
 	Status           string      `json:"status" gorm:"type:varchar(10);comment:Status"`
 	Image            string      `json:"image" gorm:"type:varchar(100);comment:Image"`
@@ -102,7 +101,7 @@ func ServerList(client *gophercloud.ServiceClient, name string) []servers.Server
 	return allServes
 }
 
-func UpateServer(client *gophercloud.ServiceClient, name string, serverID string, ImageRef string) error {
+func RebuildServer(client *gophercloud.ServiceClient, name string, serverID string, ImageRef string) error {
 	rebuildOpts := servers.RebuildOpts{
 		Name:     name,
 		ImageRef: ImageRef,
@@ -110,8 +109,40 @@ func UpateServer(client *gophercloud.ServiceClient, name string, serverID string
 
 	_, err := servers.Rebuild(client, serverID, rebuildOpts).Extract()
 	if err != nil {
-		fmt.Printf("openstack update server error:%s \r\n", err)
+		fmt.Printf("openstack rebuild server error:%s \r\n", err)
 		return err
 	}
 	return nil
+}
+
+func RebootServer(client *gophercloud.ServiceClient, serverID string) error {
+	rebootOpts := servers.RebootOpts{
+		Type: servers.SoftReboot,
+	}
+
+	err := servers.Reboot(client, serverID, rebootOpts).ExtractErr()
+	if err != nil {
+		fmt.Printf("openstack reboot server error:%s \r\n", err)
+		return err
+	}
+	return nil
+}
+
+func GetSserverInfo(client *gophercloud.ServiceClient, name string) servers.Server {
+	opts := servers.ListOpts{
+		Name: name,
+	}
+
+	allPage, err := servers.List(client, opts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack get server info error:%s \r\n", err)
+		return servers.Server{}
+	}
+
+	allServes, err := servers.ExtractServers(allPage)
+	if err != nil {
+		fmt.Printf("openstack get server info error:%s \r\n", err)
+		return servers.Server{}
+	}
+	return allServes[0]
 }

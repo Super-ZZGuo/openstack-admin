@@ -41,7 +41,7 @@ func (e *SysRange) GetPage(c *dto.SysRangeGetPageReq, p *actions.DataPermission,
 func (e *SysRange) Get(d *dto.SysRangeGetReq, p *actions.DataPermission, model *models.SysRange) error {
 	var data models.SysRange
 
-	err := e.Orm.Model(&data).
+	err := e.Orm.Model(&data).Preload("Project").
 		Scopes(
 			actions.Permission(data.TableName(), p),
 		).
@@ -72,21 +72,24 @@ func (e *SysRange) Insert(c *dto.SysRangeInsertReq) error {
 }
 
 // Update 修改SysRange对象
-func (e *SysRange) Update(c *dto.SysRangeUpdateReq, p *actions.DataPermission) error {
+func (e *SysRange) Update(c *dto.SysRangeStatusUpadteReq, p *actions.DataPermission) error {
 	var err error
-	var data = models.SysRange{}
-	e.Orm.Scopes(
-		actions.Permission(data.TableName(), p),
-	).First(&data, c.GetId())
-	c.Generate(&data)
-
-	db := e.Orm.Save(&data)
+	var model models.SysRange
+	db := e.Orm.Scopes(
+		actions.Permission(model.TableName(), p),
+	).First(&model, c.GetId())
 	if err = db.Error; err != nil {
-		e.Log.Errorf("SysRangeService Save error:%s \r\n", err)
+		e.Log.Errorf("Service UpdateSysRange path error: %s", err)
 		return err
 	}
 	if db.RowsAffected == 0 {
 		return errors.New("无权更新该数据")
+
+	}
+	err = e.Orm.Table(model.TableName()).Where("range_id = ? ", c.RangeId).Updates(c).Error
+	if err != nil {
+		e.Log.Errorf("Service UpdateSysRange path error: %s", err)
+		return err
 	}
 	return nil
 }

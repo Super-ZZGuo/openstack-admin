@@ -86,7 +86,8 @@ func (e SysRange) Get(c *gin.Context) {
 		return
 	}
 	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
-	object.RangeConsole = models.RemoteConsole(client, object.RangeOpenstackId)
+	rangeOpenstackId := models.GetSserverInfo(client, object.RangeName).ID
+	object.RangeConsole = models.RemoteConsole(client, rangeOpenstackId)
 
 	e.OK(object, "查询成功")
 }
@@ -115,19 +116,41 @@ func (e SysRange) Insert(c *gin.Context) {
 		return
 	}
 
-	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
+	computeClient := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
+	imageClient := models.CreateImageClient(models.CreateImageProvider(req.ProjectName))
+	imageId := models.GetImageId(imageClient, req.Image)
+	flavorClient := models.CreateFlavorClient(models.CreateFlavorProvider(req.ProjectName))
+	flavorId := models.GetFlavorId(flavorClient, req.Flavor)
+	networkClient := models.CreateNetworkClient(models.CreateNetworkProvider(req.ProjectName))
+	var networks []servers.Network
+
+	if flavorId == "" || imageId == "" {
+		e.Error(500, err, err.Error())
+		return
+	}
+
+	for _, network := range req.Network {
+		networkId, _ := models.GetNetworkId(networkClient, network.NetworkName)
+		new := servers.Network{
+			UUID:    networkId,
+			FixedIP: network.Ipadress,
+		}
+		networks = append(networks, new)
+	}
+
 	createOpts := servers.CreateOpts{
 		Name:      req.RangeName,
-		ImageRef:  req.Image,
-		FlavorRef: req.Flavor,
+		ImageRef:  imageId,
+		FlavorRef: flavorId,
+		Networks:  networks,
 	}
-	_, err = servers.Create(client, createOpts).Extract()
+	_, err = servers.Create(computeClient, createOpts).Extract()
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("创建SysRange失败，\r\n失败信息 %s", err.Error()))
 		return
 	}
 
-	req.RangeOpenstackId = models.ServerList(client, req.RangeName)[0].ID
+	req.RangeOpenstackId = models.GetSserverInfo(computeClient, req.RangeName).ID
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
 
@@ -153,6 +176,7 @@ func (e SysRange) Insert(c *gin.Context) {
 // @Security Bearer
 func (e SysRange) Update(c *gin.Context) {
 	req := dto.SysRangeUpdateReq{}
+	new := dto.SysRangeStatusUpadteReq{}
 	s := service.SysRange{}
 	err := e.MakeContext(c).
 		MakeOrm().
@@ -167,18 +191,35 @@ func (e SysRange) Update(c *gin.Context) {
 	req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
 
-	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
-	err = models.UpateServer(client, req.RangeName, req.RangeOpenstackId, req.Image)
+	computeClient := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
+	serverId := models.GetSserverInfo(computeClient, req.RangeName).ID
+	imageClient := models.CreateImageClient(models.CreateImageProvider(req.ProjectName))
+	imageId := models.GetImageId(imageClient, req.Image)
+
+	switch req.Option {
+	case "rebuild":
+		err = models.RebuildServer(computeClient, req.RangeName, serverId, imageId)
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("rebuild Range失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+
+	case "reboot":
+		err = models.RebootServer(computeClient, serverId)
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("reboot Range失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+	}
+	new.RangeId = req.RangeId
+	new.Status = models.GetSserverInfo(computeClient, req.RangeName).Status
+
+	err = s.Update(&new, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("修改SysRange失败，\r\n失败信息 %s", err.Error()))
 		return
 	}
 
-	err = s.Update(&req, p)
-	if err != nil {
-		e.Error(500, err, fmt.Sprintf("修改SysRange失败，\r\n失败信息 %s", err.Error()))
-		return
-	}
 	e.OK(req.GetId(), "修改成功")
 }
 
@@ -204,7 +245,8 @@ func (e SysRange) Delete(c *gin.Context) {
 		return
 	}
 	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
-	for _, serverID := range req.RangeOpenstackId {
+	for _, name := range req.RangeNames {
+		serverID := models.GetSserverInfo(client, name).ID
 		servers.Delete(client, serverID)
 	}
 
