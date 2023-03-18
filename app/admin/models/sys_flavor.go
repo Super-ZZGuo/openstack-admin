@@ -88,3 +88,25 @@ func DeleteFlavor(computeClient *gophercloud.ServiceClient, ID int) error {
 	}
 	return nil
 }
+
+func GetFlavorId(computeClient *gophercloud.ServiceClient, name string) string {
+	listOpts := flavors.ListOpts{}
+
+	allPages, err := flavors.ListDetail(computeClient, listOpts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack get flavor id error:%s \r\n", err)
+		return ""
+	}
+
+	allFlavors, err := flavors.ExtractFlavors(allPages)
+	if err != nil {
+		fmt.Printf("openstack get flavor id error:%s \r\n", err)
+		return ""
+	}
+	for _, flavor := range allFlavors {
+		if flavor.Name == name {
+			return flavor.ID
+		}
+	}
+	return ""
+}
