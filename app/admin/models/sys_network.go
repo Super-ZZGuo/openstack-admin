@@ -14,7 +14,7 @@ type SysNetwork struct {
 	NetworkId   int    `json:"networkId" gorm:"primaryKey;autoIncrement;comment:imageid"`
 	NetworkName string `json:"networkName" gorm:"type:varchar(10);comment:NetworkName"`
 	Cidr        string `json:"cidr" gorm:"type:varchar(20);comment:Cidr"`
-	ProjectName string `json:"peojectName" gorm:"type:varchar(20);comment:"`
+	ProjectName string `json:"projectName" gorm:"type:varchar(20);comment:"`
 	PoolStart   string `json:"poolStart" gorm:"type:varchar(20);comment:PoolStart"`
 	PoolEnd     string `json:"poolEnd" gorm:"type:varchar(20);comment:PoolEnd"`
 	Tag         string `json:"tag" gorm:"type:varchar(255);comment:Tag"`
