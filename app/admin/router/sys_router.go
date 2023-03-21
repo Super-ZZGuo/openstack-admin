@@ -9,13 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/ws"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	swaggerfiles "github.com/swaggo/files"
 
 	"go-admin/common/middleware"
 	"go-admin/common/middleware/handler"
-	_ "go-admin/docs/admin"
 )
 
 func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.RouterGroup {
@@ -23,10 +19,6 @@ func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.Rou
 	sysBaseRouter(g)
 	// 静态文件
 	sysStaticFileRouter(g)
-	// swagger；注意：生产环境可以注释掉
-	if config.ApplicationConfig.Mode != "prod" {
-		sysSwaggerRouter(g)
-	}
 	// 需要认证
 	sysCheckRoleRouterInit(g, authMiddleware)
 	return g
@@ -53,10 +45,6 @@ func sysStaticFileRouter(r *gin.RouterGroup) {
 	if config.ApplicationConfig.Mode != "prod" {
 		r.Static("/form-generator", "./static/form-generator")
 	}
-}
-
-func sysSwaggerRouter(r *gin.RouterGroup) {
-	r.GET("/swagger/admin/*any", ginSwagger.WrapHandler(swaggerfiles.NewHandler(), ginSwagger.InstanceName("admin")))
 }
 
 func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
