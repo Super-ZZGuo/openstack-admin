@@ -8,7 +8,7 @@ import (
 
 type SysNetworkGetPageReq struct {
 	dto.Pagination `search:"-"`
-	ProjectName    string `form:"projectName"  search:"type:contains;column:project_name;table:sys_network"`
+	ProjectName    string `form:"networkName"  search:"type:contains;column:network_name;table:sys_network"`
 	SysNetworkOrder
 }
 

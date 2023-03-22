@@ -8,15 +8,15 @@ import (
 
 type SysImageGetPageReq struct {
 	dto.Pagination `search:"-"`
+	ImageName      string `form:"imageName"  search:"type:contains;column:image_name;table:sys_image"`
+	Type           string `form:"type"  search:"type:contains;column:type;table:sys_image"`
 	SysImageOrder
 }
 
 type SysImageOrder struct {
 	ImageId     string `form:"imageIdOrder"  search:"type:order;column:image_id;table:sys_image"`
-	ImageName   string `form:"imageNameOrder"  search:"type:order;column:image_name;table:sys_image"`
 	OpenstackId string `form:"openstackIdOrder"  search:"type:order;column:openstack_id;table:sys_image"`
 	Tag         string `form:"tagOrder"  search:"type:order;column:tag;table:sys_image"`
-	Type        string `form:"typeOrder"  search:"type:order;column:type;table:sys_image"`
 	CreateBy    string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_image"`
 	UpdateBy    string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_image"`
 	CreatedAt   string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_image"`
