@@ -1,10 +1,10 @@
 package router
 
 import (
+	"go-admin/app/admin/apis"
+
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
-	"go-admin/app/admin/apis"
-	"go-admin/common/middleware"
 )
 
 func init() {
@@ -14,7 +14,7 @@ func init() {
 func registerDictRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	dictApi := apis.SysDictType{}
 	dataApi := apis.SysDictData{}
-	dicts := v1.Group("/dict").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	dicts := v1.Group("/dict").Use(authMiddleware.MiddlewareFunc())
 	{
 
 		dicts.GET("/data", dataApi.GetPage)
@@ -30,7 +30,7 @@ func registerDictRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlewar
 		dicts.PUT("/type/:id", dictApi.Update)
 		dicts.DELETE("/type", dictApi.Delete)
 	}
-	opSelect := v1.Group("/dict-data").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	opSelect := v1.Group("/dict-data").Use(authMiddleware.MiddlewareFunc())
 	{
 		opSelect.GET("/option-select", dataApi.GetAll)
 	}

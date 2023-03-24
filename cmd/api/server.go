@@ -18,8 +18,10 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/runtime"
 	"github.com/spf13/cobra"
 
+	"go-admin/app/admin/models"
 	"go-admin/app/admin/router"
 	"go-admin/common/database"
+	"go-admin/common/global"
 	common "go-admin/common/middleware"
 	"go-admin/common/middleware/handler"
 	"go-admin/common/storage"
@@ -66,7 +68,7 @@ func setup() {
 	queue := sdk.Runtime.GetMemoryQueue("")
 	// queue.Register(global.LoginLog, models.SaveLoginLog)
 	// queue.Register(global.OperateLog, models.SaveOperaLog)
-	// queue.Register(global.ApiCheck, models.SaveSysApi)
+	queue.Register(global.ApiCheck, models.SaveSysApi)
 	go queue.Run()
 
 	usageStr := `starting api server...`

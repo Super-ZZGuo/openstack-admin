@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/go-admin-team/go-admin-core/sdk/config"
 	"gorm.io/gorm/clause"
@@ -168,7 +169,9 @@ func (e *SysRole) Update(c *dto.SysRoleUpdateReq, cb *casbin.SyncedEnforcer) err
 	}
 	mp := make(map[string]interface{}, 0)
 	polices := make([][]string, 0)
+
 	for _, menu := range mlist {
+		fmt.Println(menu.SysApi)
 		for _, api := range menu.SysApi {
 			if mp[model.RoleKey+"-"+api.Path+"-"+api.Action] != "" {
 				mp[model.RoleKey+"-"+api.Path+"-"+api.Action] = ""
@@ -181,6 +184,8 @@ func (e *SysRole) Update(c *dto.SysRoleUpdateReq, cb *casbin.SyncedEnforcer) err
 		return nil
 	}
 	_, err = cb.AddNamedPolicies("p", polices)
+	fmt.Println("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+	fmt.Println(polices)
 	if err != nil {
 		return err
 	}
