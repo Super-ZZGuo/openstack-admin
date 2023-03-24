@@ -51,7 +51,38 @@ func (e SysNetwork) GetPage(c *gin.Context) {
 		return
 	}
 
-	e.PageOK(list, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
+	responseList := make([]dto.SysNetworkGetPageRespone, 0)
+	// client, _ := openstack.NewIdentityV3(models.CreateComputeProvider("admin"), gophercloud.EndpointOpts{})
+	// projectList := models.GetProjectList(client)
+	// for _, project := range projectList {
+	// 	if project.Name == "admin" || project.Name == "service" {
+	// 		continue
+	// 	} else {
+	// 		responseList = append(responseList, dto.SysNetworkGetPageRespone{
+	// 			ProjectName: project.Name,
+	// 			Children:    []models.SysNetwork{},
+	// 		})
+	// 	}
+	// }
+	for _, item := range list {
+		if len(responseList) == 0 {
+			responseList = append(responseList, dto.SysNetworkGetPageRespone{
+				ProjectName: item.ProjectName,
+				Children:    []models.SysNetwork{},
+			})
+			item.ProjectName = ""
+			responseList[0].Children = append(responseList[0].Children, item)
+		} else {
+			for i := range responseList {
+				if responseList[i].ProjectName == item.ProjectName {
+					item.ProjectName = ""
+					responseList[i].Children = append(responseList[i].Children, item)
+				}
+			}
+		}
+	}
+
+	e.PageOK(responseList, len(responseList), req.GetPageIndex(), req.GetPageSize(), "查询成功")
 }
 
 // Get 获取SysNetwork

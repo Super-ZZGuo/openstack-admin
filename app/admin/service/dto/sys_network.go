@@ -8,22 +8,22 @@ import (
 
 type SysNetworkGetPageReq struct {
 	dto.Pagination `search:"-"`
-	ProjectName    string `form:"networkName"  search:"type:contains;column:network_name;table:sys_network"`
+	ProjectName    string `form:"projectName"  search:"type:contains;column:project_name;table:sys_network"`
+	NetworkName    string `form:"networkName"  search:"type:contains;column:network_name;table:sys_network"`
 	SysNetworkOrder
 }
 
 type SysNetworkOrder struct {
-	NetworkId   string `form:"networkIdOrder"  search:"type:order;column:network_id;table:sys_network"`
-	NetworkName string `form:"networkNameOrder"  search:"type:order;column:network_name;table:sys_network"`
-	Cidr        string `form:"cidrOrder"  search:"type:order;column:cidr;table:sys_network"`
-	PoolStart   string `form:"poolStartOrder"  search:"type:order;column:pool_start;table:sys_network"`
-	PoolEnd     string `form:"poolEndOrder"  search:"type:order;column:pool_end;table:sys_network"`
-	Tag         string `form:"tagOrder"  search:"type:order;column:tag;table:sys_network"`
-	CreateBy    string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_network"`
-	UpdateBy    string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_network"`
-	CreatedAt   string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_network"`
-	UpdatedAt   string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_network"`
-	DeletedAt   string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_network"`
+	NetworkId string `form:"networkIdOrder"  search:"type:order;column:network_id;table:sys_network"`
+	Cidr      string `form:"cidrOrder"  search:"type:order;column:cidr;table:sys_network"`
+	PoolStart string `form:"poolStartOrder"  search:"type:order;column:pool_start;table:sys_network"`
+	PoolEnd   string `form:"poolEndOrder"  search:"type:order;column:pool_end;table:sys_network"`
+	Tag       string `form:"tagOrder"  search:"type:order;column:tag;table:sys_network"`
+	CreateBy  string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_network"`
+	UpdateBy  string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_network"`
+	CreatedAt string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_network"`
+	UpdatedAt string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_network"`
+	DeletedAt string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_network"`
 }
 
 func (m *SysNetworkGetPageReq) GetNeedSearch() interface{} {
@@ -118,4 +118,9 @@ type SysNetworkDeleteReq struct {
 
 func (s *SysNetworkDeleteReq) GetId() interface{} {
 	return s.Ids
+}
+
+type SysNetworkGetPageRespone struct {
+	ProjectName string              `json:"projectName"`
+	Children    []models.SysNetwork `json:"children"`
 }

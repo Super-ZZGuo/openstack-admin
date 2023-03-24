@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"go-admin/common/models"
-	"strconv"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -62,9 +61,8 @@ func CreateFlavorClient(provider *gophercloud.ProviderClient) *gophercloud.Servi
 	return client
 }
 
-func CreateFlavor(computeClient *gophercloud.ServiceClient, ID int, Name string, Disk int, RAM int, VCPUs int) error {
+func CreateFlavor(computeClient *gophercloud.ServiceClient, Name string, Disk int, RAM int, VCPUs int) error {
 	createOpts := flavors.CreateOpts{
-		ID:         strconv.Itoa(ID),
 		Name:       Name,
 		Disk:       gophercloud.IntToPointer(Disk),
 		RAM:        RAM,
@@ -80,8 +78,8 @@ func CreateFlavor(computeClient *gophercloud.ServiceClient, ID int, Name string,
 	return nil
 }
 
-func DeleteFlavor(computeClient *gophercloud.ServiceClient, ID int) error {
-	err := flavors.Delete(computeClient, strconv.Itoa(ID)).ExtractErr()
+func DeleteFlavor(computeClient *gophercloud.ServiceClient, ID string) error {
+	err := flavors.Delete(computeClient, ID).ExtractErr()
 	if err != nil {
 		fmt.Printf("openstack delete flavor error:%s \r\n", err)
 		return err

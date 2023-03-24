@@ -6,7 +6,6 @@ import (
 
 	"go-admin/app/admin/apis"
 	"go-admin/common/actions"
-	"go-admin/common/middleware"
 )
 
 func init() {
@@ -16,7 +15,7 @@ func init() {
 // registerSysRangeRouter
 func registerSysRangeRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	api := apis.SysRange{}
-	r := v1.Group("/sys-range").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	r := v1.Group("/sys-range").Use(authMiddleware.MiddlewareFunc())
 	{
 		r.GET("", actions.PermissionAction(), api.GetPage)
 		r.GET("/:id", actions.PermissionAction(), api.Get)

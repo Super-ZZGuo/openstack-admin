@@ -5,7 +5,6 @@ import (
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
 
 	"go-admin/app/admin/apis"
-	"go-admin/common/middleware"
 	"go-admin/common/actions"
 )
 
@@ -16,7 +15,7 @@ func init() {
 // registerSysProjectRouter
 func registerSysProjectRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	api := apis.SysProject{}
-	r := v1.Group("/sys-project").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
+	r := v1.Group("/sys-project").Use(authMiddleware.MiddlewareFunc())
 	{
 		r.GET("", actions.PermissionAction(), api.GetPage)
 		r.GET("/:id", actions.PermissionAction(), api.Get)

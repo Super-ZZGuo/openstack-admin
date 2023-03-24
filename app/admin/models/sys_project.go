@@ -134,3 +134,20 @@ func GetProjectId(identityClient *gophercloud.ServiceClient, project_name string
 	projectID = allProjects[0].ID
 	return
 }
+
+func GetProjectList(identityClient *gophercloud.ServiceClient) (projectList []projects.Project) {
+	//get tenantid
+	listOpts := projects.ListOpts{}
+
+	allPages, err := projects.List(identityClient, listOpts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack get project id error:%s \r\n", err)
+	}
+
+	allProjects, err := projects.ExtractProjects(allPages)
+	if err != nil {
+		fmt.Printf("openstack get project id error:%s \r\n", err)
+	}
+
+	return allProjects
+}

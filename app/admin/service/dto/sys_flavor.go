@@ -8,21 +8,21 @@ import (
 
 type SysFlavorGetPageReq struct {
 	dto.Pagination `search:"-"`
+	FlavorName     string `form:"flavorName"  search:"type:contains;column:flavor_name;table:sys_flavor"`
+	Disk           string `form:"disk"  search:"type:contains;column:disk;table:sys_flavor"`
+	Vcpu           string `form:"vcpu"  search:"type:contains;column:vcpu;table:sys_flavor"`
+	Ram            string `form:"ram"  search:"type:contains;column:ram;table:sys_flavor"`
 	SysFlavorOrder
 }
 
 type SysFlavorOrder struct {
-	FlavorId   string `form:"flavorIdOrder"  search:"type:order;column:flavor_id;table:sys_flavor"`
-	FlavorName string `form:"flavorNameOrder"  search:"type:order;column:flavor_name;table:sys_flavor"`
-	Disk       string `form:"diskOrder"  search:"type:order;column:disk;table:sys_flavor"`
-	Vcpu       string `form:"vcpuOrder"  search:"type:order;column:vcpu;table:sys_flavor"`
-	Ram        string `form:"ramOrder"  search:"type:order;column:ram;table:sys_flavor"`
-	Tag        string `form:"tagOrder"  search:"type:order;column:tag;table:sys_flavor"`
-	CreateBy   string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_flavor"`
-	UpdateBy   string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_flavor"`
-	CreatedAt  string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_flavor"`
-	UpdatedAt  string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_flavor"`
-	DeletedAt  string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_flavor"`
+	FlavorId  string `form:"flavorIdOrder"  search:"type:order;column:flavor_id;table:sys_flavor"`
+	Tag       string `form:"tagOrder"  search:"type:order;column:tag;table:sys_flavor"`
+	CreateBy  string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_flavor"`
+	UpdateBy  string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_flavor"`
+	CreatedAt string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_flavor"`
+	UpdatedAt string `form:"updatedAtOrder"  search:"type:order;column:updated_at;table:sys_flavor"`
+	DeletedAt string `form:"deletedAtOrder"  search:"type:order;column:deleted_at;table:sys_flavor"`
 }
 
 func (m *SysFlavorGetPageReq) GetNeedSearch() interface{} {
@@ -30,7 +30,7 @@ func (m *SysFlavorGetPageReq) GetNeedSearch() interface{} {
 }
 
 type SysFlavorInsertReq struct {
-	FlavorId   int    `json:"flavorId" comment:""` //
+	FlavorId   int    `json:"-" comment:""` //
 	FlavorName string `json:"flavorName" comment:""`
 	Disk       int    `json:"disk" comment:""`
 	Vcpu       int    `json:"vcpu" comment:""`
@@ -92,7 +92,8 @@ func (s *SysFlavorGetReq) GetId() interface{} {
 
 // SysFlavorDeleteReq 功能删除请求参数
 type SysFlavorDeleteReq struct {
-	Ids []int `json:"ids"`
+	Ids   []int    `json:"ids"`
+	Names []string `json:"names"`
 }
 
 func (s *SysFlavorDeleteReq) GetId() interface{} {

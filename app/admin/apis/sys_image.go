@@ -238,18 +238,22 @@ func (e SysImage) UploadSysImage(c *gin.Context) {
 	// 数据权限检查
 	p := actions.GetPermissionFromContext(c)
 	form, _ := c.MultipartForm()
-	files := form.File["upload"]
+	file := form.File["upload"][0]
 	filPath := "static/uploadfile/image/" + form.Value["type"][0] + "/" + form.Value["imageName"][0] + "." + form.Value["type"][0]
-	for _, file := range files {
-		e.Logger.Debugf("upload image file: %s", file.Filename)
-		// 上传文件至指定目录
-		err = c.SaveUploadedFile(file, filPath)
-		if err != nil {
-			e.Logger.Errorf("save file error, %s", err.Error())
-			e.Error(500, err, "")
-			return
-		}
+	fmt.Println(filPath)
+	fmt.Println(filPath)
+	fmt.Println(filPath)
+	fmt.Println(filPath)
+
+	e.Logger.Debugf("upload image file: %s", file.Filename)
+	// 上传文件至指定目录
+	err = c.SaveUploadedFile(file, filPath)
+	if err != nil {
+		e.Logger.Errorf("save file error, %s", err.Error())
+		e.Error(500, err, "")
+		return
 	}
+
 	req.ImageId, _ = strconv.Atoi(form.Value["imageId"][0])
 	req.Type = form.Value["type"][0]
 	req.ImageName = form.Value["imageName"][0]

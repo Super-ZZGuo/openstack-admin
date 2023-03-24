@@ -114,7 +114,7 @@ func (e SysFlavor) Insert(c *gin.Context) {
 	req.SetCreateBy(user.GetUserId(c))
 
 	client := models.CreateFlavorClient(models.CreateFlavorProvider("admin"))
-	err = models.CreateFlavor(client, req.FlavorId, req.FlavorName, req.Disk, req.Ram, req.Vcpu)
+	err = models.CreateFlavor(client, req.FlavorName, req.Disk, req.Ram, req.Vcpu)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("创建SysFlavor失败，\r\n失败信息 %s", err.Error()))
 		return
@@ -190,8 +190,9 @@ func (e SysFlavor) Delete(c *gin.Context) {
 	p := actions.GetPermissionFromContext(c)
 
 	client := models.CreateFlavorClient(models.CreateFlavorProvider("admin"))
-	for _, id := range req.Ids {
-		err = models.DeleteFlavor(client, id)
+	for _, name := range req.Names {
+		flavorId := models.GetFlavorId(client, name)
+		err = models.DeleteFlavor(client, flavorId)
 		if err != nil {
 			e.Error(500, err, fmt.Sprintf("删除SysFlavor失败，\r\n失败信息 %s", err.Error()))
 			return
