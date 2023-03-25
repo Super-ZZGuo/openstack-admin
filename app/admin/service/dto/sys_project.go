@@ -9,7 +9,7 @@ import (
 type SysProjectGetPageReq struct {
 	dto.Pagination `search:"-"`
 	ProjectId      string `form:"projectId"  search:"type:exact;column:project_id;table:sys_project"`
-	ProjectName    string `form:"projectName"  search:"type:exact;column:project_name;table:sys_project"`
+	ProjectName    string `form:"projectName"  search:"type:contains;column:project_name;table:sys_project"`
 	SysProjectOrder
 }
 
