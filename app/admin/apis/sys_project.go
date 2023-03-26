@@ -198,10 +198,12 @@ func (e SysProject) Delete(c *gin.Context) {
 	// req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
 
-	client := models.CreateIdentityClient(models.CreateIdentityProvider(req.ProjectName))
-	err = models.DelteProject(client, req.ProjectName)
-	if err != nil {
-		return
+	for _, name := range req.ProjectNames {
+		client := models.CreateIdentityClient(models.CreateIdentityProvider(name))
+		err = models.DelteProject(client, name)
+		if err != nil {
+			return
+		}
 	}
 
 	err = s.Remove(&req, p)

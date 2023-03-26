@@ -90,8 +90,8 @@ func (s *SysProjectGetReq) GetId() interface{} {
 
 // SysProjectDeleteReq 功能删除请求参数
 type SysProjectDeleteReq struct {
-	Ids         []int  `json:"ids"`
-	ProjectName string `json:"projectName" comment:""`
+	Ids          []int    `json:"ids"`
+	ProjectNames []string `json:"projectNames" comment:""`
 }
 
 func (s *SysProjectDeleteReq) GetId() interface{} {

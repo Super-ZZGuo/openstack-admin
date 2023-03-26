@@ -193,11 +193,11 @@ func (e SysRange) Update(c *gin.Context) {
 
 	computeClient := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
 	serverId := models.GetSserverInfo(computeClient, req.RangeName).ID
-	imageClient := models.CreateImageClient(models.CreateImageProvider(req.ProjectName))
-	imageId := models.GetImageId(imageClient, req.Image)
 
 	switch req.Option {
 	case "rebuild":
+		imageClient := models.CreateImageClient(models.CreateImageProvider(req.ProjectName))
+		imageId := models.GetImageId(imageClient, req.Image)
 		err = models.RebuildServer(computeClient, req.RangeName, serverId, imageId)
 		if err != nil {
 			e.Error(500, err, fmt.Sprintf("rebuild Range失败，\r\n失败信息 %s", err.Error()))
