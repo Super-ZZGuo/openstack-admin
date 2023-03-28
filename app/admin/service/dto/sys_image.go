@@ -121,10 +121,19 @@ func (s *SysImageGetReq) GetId() interface{} {
 
 // SysImageDeleteReq 功能删除请求参数
 type SysImageDeleteReq struct {
-	Ids   []int    `json:"ids"`
-	Names []string `json:"names"`
+	Ids      []int    `json:"ids"`
+	Names    []string `json:"names"`
+	IsUpload bool     `json:"isUpload"`
 }
 
 func (s *SysImageDeleteReq) GetId() interface{} {
+	return s.Ids
+}
+
+type SysImageDelete struct {
+	Ids []int `json:"ids"`
+}
+
+func (s *SysImageDelete) GetId() interface{} {
 	return s.Ids
 }

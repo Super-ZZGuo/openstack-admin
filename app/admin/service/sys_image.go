@@ -94,7 +94,7 @@ func (e *SysImage) Update(c *dto.SysImagePutUpdateReq, p *actions.DataPermission
 }
 
 // Remove 删除SysImage
-func (e *SysImage) Remove(d *dto.SysImageDeleteReq, p *actions.DataPermission) error {
+func (e *SysImage) Remove(d *dto.SysImageDelete, p *actions.DataPermission) error {
 	var data models.SysImage
 
 	db := e.Orm.Model(&data).

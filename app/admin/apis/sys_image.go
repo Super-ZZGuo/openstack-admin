@@ -190,6 +190,7 @@ func (e SysImage) Update(c *gin.Context) {
 func (e SysImage) Delete(c *gin.Context) {
 	s := service.SysImage{}
 	req := dto.SysImageDeleteReq{}
+	new := dto.SysImageDelete{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		Bind(&req).
@@ -203,18 +204,20 @@ func (e SysImage) Delete(c *gin.Context) {
 
 	// req.SetUpdateBy(user.GetUserId(c))
 	p := actions.GetPermissionFromContext(c)
-	client := models.CreateImageClient(models.CreateImageProvider("admin"))
-	var openstackId string
-	for _, v := range req.Names {
-		openstackId = models.GetImageId(client, v)
-		err = models.DeleteImage(client, openstackId)
-		if err != nil {
-			e.Error(500, err, fmt.Sprintf("删除SysImage失败，\r\n失败信息 %s", err.Error()))
-			return
+	if req.IsUpload {
+		client := models.CreateImageClient(models.CreateImageProvider("admin"))
+		var openstackId string
+		for _, v := range req.Names {
+			openstackId = models.GetImageId(client, v)
+			err = models.DeleteImage(client, openstackId)
+			if err != nil {
+				e.Error(500, err, fmt.Sprintf("删除SysImage失败，\r\n失败信息 %s", err.Error()))
+				return
+			}
 		}
 	}
-
-	err = s.Remove(&req, p)
+	new.Ids = req.Ids
+	err = s.Remove(&new, p)
 	if err != nil {
 		e.Error(500, err, fmt.Sprintf("删除SysImage失败，\r\n失败信息 %s", err.Error()))
 		return
@@ -240,10 +243,6 @@ func (e SysImage) UploadSysImage(c *gin.Context) {
 	form, _ := c.MultipartForm()
 	file := form.File["upload"][0]
 	filPath := "static/uploadfile/image/" + form.Value["type"][0] + "/" + form.Value["imageName"][0] + "." + form.Value["type"][0]
-	fmt.Println(filPath)
-	fmt.Println(filPath)
-	fmt.Println(filPath)
-	fmt.Println(filPath)
 
 	e.Logger.Debugf("upload image file: %s", file.Filename)
 	// 上传文件至指定目录
