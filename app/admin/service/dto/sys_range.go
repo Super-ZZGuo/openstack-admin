@@ -9,7 +9,6 @@ import (
 type SysRangeGetPageReq struct {
 	dto.Pagination `search:"-"`
 	ProjectName    string `form:"projectName" search:"type:contains;column:project_name;table:sys_range" comment:""`
-	ProjectJoin    `search:"type:left;on:project_name:project_name;table:sys_range;join:sys_project"`
 	SysRangeOrder
 }
 

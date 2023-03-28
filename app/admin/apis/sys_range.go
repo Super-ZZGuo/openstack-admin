@@ -247,7 +247,12 @@ func (e SysRange) Delete(c *gin.Context) {
 	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
 	for _, name := range req.RangeNames {
 		serverID := models.GetSserverInfo(client, name).ID
-		servers.Delete(client, serverID)
+		err = servers.Delete(client, serverID).ExtractErr()
+		if err != nil {
+			e.Logger.Error(err)
+			e.Error(500, err, err.Error())
+			return
+		}
 	}
 
 	// req.SetUpdateBy(user.GetUserId(c))
