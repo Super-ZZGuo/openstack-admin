@@ -7,6 +7,8 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
 
 	"go-admin/app/admin/models"
 	"go-admin/app/admin/service"
@@ -50,7 +52,31 @@ func (e SysNetwork) GetPage(c *gin.Context) {
 		e.Error(500, err, fmt.Sprintf("获取SysNetwork失败，\r\n失败信息 %s", err.Error()))
 		return
 	}
-
+	client, _ := openstack.NewIdentityV3(models.CreateComputeProvider("admin"), gophercloud.EndpointOpts{})
+	for i := 0; i < len(list); i++ {
+		fmt.Println(list[i].ProjectName)
+		pList, err := models.GetProjectList(client, list[i].ProjectName)
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("获取SysNetwork失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+		if len(pList) == 0 {
+			err = s.Remove(&dto.SysNetworkDeleteReq{
+				Ids:          []int{list[i].NetworkId},
+				ProjectName:  list[i].ProjectName,
+				NetworkNames: []string{list[i].NetworkName},
+			}, p)
+			if err != nil {
+				e.Error(500, err, fmt.Sprintf("获取SysNetwork失败，\r\n失败信息 %s", err.Error()))
+				return
+			}
+		}
+	}
+	err = s.GetPage(&req, p, &list, &count)
+	if err != nil {
+		e.Error(500, err, fmt.Sprintf("获取SysNetwork失败，\r\n失败信息 %s", err.Error()))
+		return
+	}
 	responseList := make([]dto.SysNetworkGetPageRespone, 0)
 	// client, _ := openstack.NewIdentityV3(models.CreateComputeProvider("admin"), gophercloud.EndpointOpts{})
 	// projectList := models.GetProjectList(client)
@@ -64,6 +90,7 @@ func (e SysNetwork) GetPage(c *gin.Context) {
 	// 		})
 	// 	}
 	// }
+outer:
 	for _, item := range list {
 		if len(responseList) == 0 {
 			responseList = append(responseList, dto.SysNetworkGetPageRespone{
@@ -73,12 +100,19 @@ func (e SysNetwork) GetPage(c *gin.Context) {
 			item.ProjectName = ""
 			responseList[0].Children = append(responseList[0].Children, item)
 		} else {
-			for i := range responseList {
+			for i := 0; i < len(responseList); i++ {
 				if responseList[i].ProjectName == item.ProjectName {
 					item.ProjectName = ""
 					responseList[i].Children = append(responseList[i].Children, item)
+					continue outer
 				}
 			}
+			responseList = append(responseList, dto.SysNetworkGetPageRespone{
+				ProjectName: item.ProjectName,
+				Children:    []models.SysNetwork{},
+			})
+			item.ProjectName = ""
+			responseList[len(responseList)-1].Children = append(responseList[len(responseList)-1].Children, item)
 		}
 	}
 

@@ -13,6 +13,8 @@ import (
 	"go-admin/app/admin/service/dto"
 	"go-admin/common/actions"
 
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
@@ -46,6 +48,33 @@ func (e SysRange) GetPage(c *gin.Context) {
 	p := actions.GetPermissionFromContext(c)
 	list := make([]models.SysRange, 0)
 	var count int64
+
+	err = s.GetPage(&req, p, &list, &count)
+	if err != nil {
+		e.Error(500, err, fmt.Sprintf("获取SysRange失败，\r\n失败信息 %s", err.Error()))
+		return
+	}
+
+	client, _ := openstack.NewIdentityV3(models.CreateComputeProvider("admin"), gophercloud.EndpointOpts{})
+	for i := 0; i < len(list); i++ {
+		fmt.Println(list[i].ProjectName)
+		pList, err := models.GetProjectList(client, list[i].ProjectName)
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("openstack get project失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+		if len(pList) == 0 {
+			err = s.Remove(&dto.SysRangeDeleteReq{
+				Ids:         []int{list[i].RangeId},
+				ProjectName: list[i].ProjectName,
+				RangeNames:  []string{list[i].RangeName},
+			}, p)
+			if err != nil {
+				e.Error(500, err, fmt.Sprintf("获取SysNetwork失败，\r\n失败信息 %s", err.Error()))
+				return
+			}
+		}
+	}
 
 	err = s.GetPage(&req, p, &list, &count)
 	if err != nil {
@@ -138,6 +167,11 @@ func (e SysRange) Insert(c *gin.Context) {
 		networks = append(networks, new)
 	}
 
+	for _, network := range req.Network {
+		req.Ipadress = network.NetworkName + ": " + network.Ipadress + "\\n"
+	}
+	fmt.Println(req.Ipadress)
+
 	createOpts := servers.CreateOpts{
 		Name:      req.RangeName,
 		ImageRef:  imageId,
@@ -210,9 +244,22 @@ func (e SysRange) Update(c *gin.Context) {
 			e.Error(500, err, fmt.Sprintf("reboot Range失败，\r\n失败信息 %s", err.Error()))
 			return
 		}
+	case "start":
+		err = models.StartServer(computeClient, serverId, "start")
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("start Range失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
+	case "stop":
+		err = models.StartServer(computeClient, serverId, "stop")
+		if err != nil {
+			e.Error(500, err, fmt.Sprintf("stop Range失败，\r\n失败信息 %s", err.Error()))
+			return
+		}
 	}
 	new.RangeId = req.RangeId
 	new.Status = models.GetSserverInfo(computeClient, req.RangeName).Status
+	new.RangeConsole = models.RemoteConsole(computeClient, serverId)
 
 	err = s.Update(&new, p)
 	if err != nil {

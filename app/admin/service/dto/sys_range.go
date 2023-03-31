@@ -9,6 +9,7 @@ import (
 type SysRangeGetPageReq struct {
 	dto.Pagination `search:"-"`
 	ProjectName    string `form:"projectName" search:"type:contains;column:project_name;table:sys_range" comment:""`
+	Dept           string `form:"dept"  search:"type:contains;column:dept;table:sys_range"`
 	SysRangeOrder
 }
 
@@ -18,7 +19,9 @@ type SysRangeOrder struct {
 	Status           string `form:"statusOrder"  search:"type:order;column:status;table:sys_range"`
 	Image            string `form:"imageOrder"  search:"type:order;column:image;table:sys_range"`
 	Flavor           string `form:"flavorOrder"  search:"type:order;column:flavor;table:sys_range"`
+	RangeConsole     string `form:"rangeConsoleOrder"  search:"type:order;column:range_console;table:sys_range"`
 	RangeOpenstackId string `form:"rangeOpenstackIdOrder"  search:"type:order;column:range_openstack_id;table:sys_range"`
+	Ipadress         string `form:"ipadressOrder"  search:"type:order;column:ipadress;table:sys_range"`
 	CreateBy         string `form:"createByOrder"  search:"type:order;column:create_by;table:sys_range"`
 	UpdateBy         string `form:"updateByOrder"  search:"type:order;column:update_by;table:sys_range"`
 	CreatedAt        string `form:"createdAtOrder"  search:"type:order;column:created_at;table:sys_range"`
@@ -46,7 +49,9 @@ type SysRangeInsertReq struct {
 	Image            string            `json:"image" comment:""`
 	Flavor           string            `json:"flavor" comment:""`
 	ProjectId        int               `json:"projectId" comment:""`
+	Dept             string            `json:"dept" comment:""`
 	ProjectName      string            `json:"projectName"`
+	Ipadress         string            `json:"-" comment:""`
 	RangeOpenstackId string            `json:"-"`
 	Network          []SysRangeNetwork `json:"network"`
 	common.ControlBy
@@ -61,6 +66,8 @@ func (s *SysRangeInsertReq) Generate(model *models.SysRange) {
 	model.Image = s.Image
 	model.Flavor = s.Flavor
 	model.RangeOpenstackId = s.RangeOpenstackId
+	model.Dept = s.Dept
+	model.Ipadress = s.Ipadress
 	model.CreateBy = s.CreateBy // 添加这而，需要记录是被谁创建的
 	model.ProjectId = s.ProjectId
 	model.ProjectName = s.ProjectName
@@ -94,8 +101,9 @@ func (s *SysRangeUpdateReq) GetId() interface{} {
 }
 
 type SysRangeStatusUpadteReq struct {
-	RangeId int
-	Status  string
+	RangeId      int
+	Status       string
+	RangeConsole string
 	common.ControlBy
 }
 

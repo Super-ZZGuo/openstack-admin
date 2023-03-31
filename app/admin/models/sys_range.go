@@ -7,6 +7,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/remoteconsoles"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/startstop"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
@@ -19,7 +20,9 @@ type SysRange struct {
 	RangeOpenstackId string      `json:"rangeOpenstackId" gorm:"type:varchar(100);comment:RangeOpenstackID"`
 	ProjectId        int         `json:"projectId" gorm:"type:bigint(20);comment:ProjectId"`
 	ProjectName      string      `json:"projectName" gorm:"type:varchar(100);comment:ProjectName"`
-	RangeConsole     string      `json:"rangeConsole" gorm:"-"`
+	RangeConsole     string      `json:"rangeConsole" gorm:"type:varchar(100);comment:"`
+	Dept             string      `json:"dept" gorm:"type:varchar(100);comment:"`
+	Ipadress         string      `json:"ipadress" gorm:"type:varchar(255);comment:"`
 	Project          *SysProject `json:"project"`
 	models.ModelTime
 	models.ControlBy
@@ -124,6 +127,23 @@ func RebootServer(client *gophercloud.ServiceClient, serverID string) error {
 	if err != nil {
 		fmt.Printf("openstack reboot server error:%s \r\n", err)
 		return err
+	}
+	return nil
+}
+
+func StartServer(client *gophercloud.ServiceClient, serverID string, action string) error {
+	if action == "start" {
+		err := startstop.Start(client, serverID).ExtractErr()
+		if err != nil {
+			fmt.Printf("openstack reboot server error:%s \r\n", err)
+			return err
+		}
+	} else if action == "stop" {
+		err := startstop.Stop(client, serverID).ExtractErr()
+		if err != nil {
+			fmt.Printf("openstack reboot server error:%s \r\n", err)
+			return err
+		}
 	}
 	return nil
 }
