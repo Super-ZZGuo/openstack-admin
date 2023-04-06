@@ -40,6 +40,7 @@ func (s *UseRangeGetReq) GetId() interface{} {
 
 type RangeChild struct {
 	RangeId      int    `json:"rangeId"`
+	ProjectName  string `json:"projectName"`
 	RangeName    string `json:"rangeName"`
 	Ipadress     string `json:"ipadress"`
 	RangeConsole string `json:"rangeConsole"`

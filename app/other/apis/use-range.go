@@ -54,6 +54,9 @@ func (e UseRange) GetPage(c *gin.Context) {
 		return
 	}
 
+	if object.DeptName == "监管人员" {
+		object.DeptName = ""
+	}
 	req.Dept = object.DeptName
 
 	list := make([]models_other.UseRange, 0)
@@ -108,6 +111,10 @@ outer:
 				RangeConsole: item.RangeConsole,
 			})
 		}
+	}
+
+	if req.Dept == "" {
+		responseList[0].Dept = "监管人员"
 	}
 
 	e.PageOK(responseList, int(count), req.GetPageIndex(), req.GetPageSize(), "查询成功")
