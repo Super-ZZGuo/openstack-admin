@@ -2,6 +2,7 @@ package apis
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
@@ -116,7 +117,10 @@ func (e SysRange) Get(c *gin.Context) {
 	}
 	client := models.CreateComputeClient(models.CreateComputeProvider(req.ProjectName))
 	rangeOpenstackId := models.GetSserverInfo(client, object.RangeName).ID
-	object.RangeConsole = models.RemoteConsole(client, rangeOpenstackId)
+	console := models.RemoteConsole(client, rangeOpenstackId)
+	console = strings.Replace(console, "controller:6080", "192.168.10.11:6080", -1)
+
+	object.RangeConsole = console
 
 	e.OK(object, "查询成功")
 }
@@ -259,7 +263,9 @@ func (e SysRange) Update(c *gin.Context) {
 	}
 	new.RangeId = req.RangeId
 	new.Status = models.GetSserverInfo(computeClient, req.RangeName).Status
-	new.RangeConsole = models.RemoteConsole(computeClient, serverId)
+	console := models.RemoteConsole(computeClient, serverId)
+	console = strings.Replace(console, "controller:6080", "192.168.10.11:6080", -1)
+	new.RangeConsole = console
 
 	err = s.Update(&new, p)
 	if err != nil {
