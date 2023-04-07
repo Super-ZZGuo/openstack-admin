@@ -11,7 +11,7 @@ import (
 
 type SysFlavor struct {
 	FlavorId   int    `json:"flavorId" gorm:"primaryKey;autoIncrement;comment:imageid"`
-	FlavorName string `json:"flavorName" gorm:"type:varchar(10);comment:FlavorName"`
+	FlavorName string `json:"flavorName" gorm:"type:varchar(100);comment:FlavorName"`
 	Disk       int    `json:"disk" gorm:"type:bigint(20);comment:Disk"`
 	Vcpu       int    `json:"vcpu" gorm:"type:bigint(20);comment:Vcpu"`
 	Ram        int    `json:"ram" gorm:"type:bigint(20);comment:Ram"`

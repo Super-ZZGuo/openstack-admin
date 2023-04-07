@@ -12,7 +12,7 @@ import (
 
 type SysNetwork struct {
 	NetworkId   int    `json:"networkId" gorm:"primaryKey;autoIncrement;comment:imageid"`
-	NetworkName string `json:"networkName" gorm:"type:varchar(10);comment:NetworkName"`
+	NetworkName string `json:"networkName" gorm:"type:varchar(100);comment:NetworkName"`
 	Cidr        string `json:"cidr" gorm:"type:varchar(20);comment:Cidr"`
 	ProjectName string `json:"projectName" gorm:"type:varchar(20);comment:"`
 	PoolStart   string `json:"poolStart" gorm:"type:varchar(20);comment:PoolStart"`
@@ -102,6 +102,26 @@ func GetNetworkId(networkClient *gophercloud.ServiceClient, name string) (string
 	}
 
 	return allNetworks[0].ID, nil
+}
+
+func GetNetworkList(networkClient *gophercloud.ServiceClient, projectId string) ([]networks.Network, error) {
+	listOpts := networks.ListOpts{
+		ProjectID: projectId,
+	}
+
+	allPages, err := networks.List(networkClient, listOpts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack create network error:%s \r\n", err)
+		return nil, err
+	}
+
+	allNetworks, err := networks.ExtractNetworks(allPages)
+	if err != nil {
+		fmt.Printf("openstack create network error:%s \r\n", err)
+		return nil, err
+	}
+
+	return allNetworks, nil
 }
 
 func DeleteNetwork(networkClient *gophercloud.ServiceClient, name string) error {
