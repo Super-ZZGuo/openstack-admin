@@ -59,6 +59,38 @@ func (e UseRange) GetPage(c *gin.Context) {
 	}
 	req.Dept = object.DeptName
 
+	pReq := dto_admin.SysProjectGetPageReq{
+		Status: "2", //2为开启状态
+	}
+	pList := make([]models_admin.SysProject, 0)
+	var countP int64
+	err = s.GetProjectPage(&pReq, p, &pList, &countP)
+	if err != nil {
+		e.Error(500, err, fmt.Sprintf("获取SysProject失败，\r\n失败信息 %s", err.Error()))
+		return
+	}
+	responseList := make([]dto_other.Response, 0)
+	if countP == 0 {
+		if req.Dept == "" {
+			responseList = append(responseList, dto_other.Response{
+				ProjectName: "",
+				Dept:        "监管人员",
+				Children:    []dto_other.RangeChild{},
+			})
+		} else {
+			responseList = append(responseList, dto_other.Response{
+				ProjectName: "",
+				Dept:        req.Dept,
+				Children:    []dto_other.RangeChild{},
+			})
+		}
+		e.PageOK(responseList, 0, req.GetPageIndex(), req.GetPageSize(), "查询成功")
+		return
+
+	}
+
+	req.ProjectName = pList[0].ProjectName
+
 	list := make([]models_other.UseRange, 0)
 	var count int64
 
@@ -68,52 +100,23 @@ func (e UseRange) GetPage(c *gin.Context) {
 		return
 	}
 
-	responseList := make([]dto_other.Response, 0)
-
-outer:
+	responseList = append(responseList, dto_other.Response{
+		ProjectName: req.ProjectName,
+		Dept:        req.Dept,
+		Children:    []dto_other.RangeChild{},
+	})
 	for _, item := range list {
-		if len(responseList) == 0 {
-			responseList = append(responseList, dto_other.Response{
-				ProjectName: item.ProjectName,
-				Dept:        item.Dept,
-				Children:    []dto_other.RangeChild{},
-			})
-			item.ProjectName = ""
-			responseList[0].Children = append(responseList[0].Children, dto_other.RangeChild{
-				RangeName:    item.RangeName,
-				RangeId:      item.RangeId,
-				Ipadress:     item.Ipadress,
-				RangeConsole: item.RangeConsole,
-			})
-		} else {
-			for i := 0; i < len(responseList); i++ {
-				if responseList[i].ProjectName == item.ProjectName {
-					item.ProjectName = ""
-					responseList[i].Children = append(responseList[i].Children, dto_other.RangeChild{
-						RangeName:    item.RangeName,
-						RangeId:      item.RangeId,
-						Ipadress:     item.Ipadress,
-						RangeConsole: item.RangeConsole,
-					})
-					continue outer
-				}
-			}
-			responseList = append(responseList, dto_other.Response{
-				ProjectName: item.ProjectName,
-				Dept:        item.Dept,
-				Children:    []dto_other.RangeChild{},
-			})
-			item.ProjectName = ""
-			responseList[len(responseList)-1].Children = append(responseList[len(responseList)-1].Children, dto_other.RangeChild{
-				RangeName:    item.RangeName,
-				RangeId:      item.RangeId,
-				Ipadress:     item.Ipadress,
-				RangeConsole: item.RangeConsole,
-			})
-		}
+		item.ProjectName = ""
+		responseList[0].Children = append(responseList[0].Children, dto_other.RangeChild{
+			RangeName:    item.RangeName,
+			RangeId:      item.RangeId,
+			Ipadress:     item.Ipadress,
+			RangeConsole: item.RangeConsole,
+		})
+
 	}
 
-	if req.Dept == "" {
+	if req.Dept == "" && len(responseList) != 0 {
 		responseList[0].Dept = "监管人员"
 	}
 

@@ -77,3 +77,22 @@ func (e *UseRange) GetDept(d *dto.SysDeptGetReq, model *models_admin.SysDept) er
 	}
 	return nil
 }
+
+func (e *UseRange) GetProjectPage(c *dto.SysProjectGetPageReq, p *actions.DataPermission, list *[]models_admin.SysProject, count *int64) error {
+	var err error
+	var data models_admin.SysProject
+
+	err = e.Orm.Model(&data).
+		Scopes(
+			cDto.MakeCondition(c.GetNeedSearch()),
+			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
+			actions.Permission(data.TableName(), p),
+		).
+		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("SysProjectService GetPage error:%s \r\n", err)
+		return err
+	}
+	return nil
+}
