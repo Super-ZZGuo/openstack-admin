@@ -85,25 +85,6 @@ func RemoteConsole(computeClient *gophercloud.ServiceClient, serverID string) st
 	return remtoteConsole.URL
 }
 
-func ServerList(client *gophercloud.ServiceClient, name string) []servers.Server {
-	opts := servers.ListOpts{
-		Name: name,
-	}
-
-	allPage, err := servers.List(client, opts).AllPages()
-	if err != nil {
-		fmt.Printf("openstack get server list error:%s \r\n", err)
-		return nil
-	}
-
-	allServes, err := servers.ExtractServers(allPage)
-	if err != nil {
-		fmt.Printf("openstack get server list error:%s \r\n", err)
-		return nil
-	}
-	return allServes
-}
-
 func RebuildServer(client *gophercloud.ServiceClient, name string, serverID string, ImageRef string) error {
 	rebuildOpts := servers.RebuildOpts{
 		Name:     name,
@@ -165,4 +146,21 @@ func GetSserverInfo(client *gophercloud.ServiceClient, name string) servers.Serv
 		return servers.Server{}
 	}
 	return allServes[0]
+}
+
+func GetSserverList(client *gophercloud.ServiceClient) []servers.Server {
+	opts := servers.ListOpts{}
+
+	allPage, err := servers.List(client, opts).AllPages()
+	if err != nil {
+		fmt.Printf("openstack get server info error:%s \r\n", err)
+		return nil
+	}
+
+	allServes, err := servers.ExtractServers(allPage)
+	if err != nil {
+		fmt.Printf("openstack get server info error:%s \r\n", err)
+		return nil
+	}
+	return allServes
 }

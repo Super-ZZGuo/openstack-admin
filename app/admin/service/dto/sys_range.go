@@ -52,6 +52,7 @@ type SysRangeInsertReq struct {
 	Dept             string            `json:"dept" comment:""`
 	ProjectName      string            `json:"projectName"`
 	Ipadress         string            `json:"-" comment:""`
+	RangeConsole     string            `json:"-" comment:""`
 	RangeOpenstackId string            `json:"-"`
 	Network          []SysRangeNetwork `json:"network"`
 	common.ControlBy
@@ -65,6 +66,7 @@ func (s *SysRangeInsertReq) Generate(model *models.SysRange) {
 	model.Status = s.Status
 	model.Image = s.Image
 	model.Flavor = s.Flavor
+	model.RangeConsole = s.RangeConsole
 	model.RangeOpenstackId = s.RangeOpenstackId
 	model.Dept = s.Dept
 	model.Ipadress = s.Ipadress

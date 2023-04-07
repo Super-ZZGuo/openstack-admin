@@ -172,9 +172,8 @@ func (e SysRange) Insert(c *gin.Context) {
 	}
 
 	for _, network := range req.Network {
-		req.Ipadress = network.NetworkName + ": " + network.Ipadress + "\\n"
+		req.Ipadress += network.NetworkName + ": " + network.Ipadress + "\\n"
 	}
-	fmt.Println(req.Ipadress)
 
 	createOpts := servers.CreateOpts{
 		Name:      req.RangeName,
@@ -187,8 +186,8 @@ func (e SysRange) Insert(c *gin.Context) {
 		e.Error(500, err, fmt.Sprintf("创建SysRange失败，\r\n失败信息 %s", err.Error()))
 		return
 	}
-
 	req.RangeOpenstackId = models.GetSserverInfo(computeClient, req.RangeName).ID
+	req.RangeConsole = "正在创建......"
 	// 设置创建人
 	req.SetCreateBy(user.GetUserId(c))
 
