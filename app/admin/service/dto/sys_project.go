@@ -10,6 +10,7 @@ type SysProjectGetPageReq struct {
 	dto.Pagination `search:"-"`
 	ProjectId      string `form:"projectId"  search:"type:exact;column:project_id;table:sys_project"`
 	ProjectName    string `form:"projectName"  search:"type:contains;column:project_name;table:sys_project"`
+	Status         string `form:"status" search:"type:exact;column:status;table:sys_project" comment:"状态"`
 	SysProjectOrder
 }
 
@@ -31,6 +32,7 @@ type SysProjectInsertReq struct {
 	ProjectId          int    `json:"-" comment:""` //
 	ProjectName        string `json:"projectName" comment:""`
 	Tag                string `json:"tag" comment:""`
+	Status             string `json:"-" comment:""`
 	ProjectOpenstackId string `json:"-" comment:""`
 	common.ControlBy
 }
@@ -40,6 +42,7 @@ func (s *SysProjectInsertReq) Generate(model *models.SysProject) {
 		model.ProjectId = s.ProjectId
 	}
 	model.ProjectName = s.ProjectName
+	model.Status = s.Status
 	model.Tag = s.Tag
 	model.ProjectOpenstackId = s.ProjectOpenstackId
 	model.CreateBy = s.CreateBy // 添加这而，需要记录是被谁创建的
@@ -52,9 +55,11 @@ func (s *SysProjectInsertReq) GetId() interface{} {
 type SysProjectUpdateReq struct {
 	ProjectId          int    `uri:"id" comment:""` //
 	NewProjectName     string `json:"newProjectName" comment:""`
+	Status             string `json:"status" comment:""`
 	OldProjectName     string `json:"oldProjectName" comment:""`
 	OldTag             string `json:"oldTag" comment:""`
 	NewTag             string `json:"newTag" comment:""`
+	Option             string `json:"option" comment:""`
 	ProjectOpenstackId string `json:"-" comment:""`
 	common.ControlBy
 }
@@ -70,12 +75,25 @@ func (s *SysProjectUpdateReq) Generate(model *models.SysProject) {
 	if s.NewTag != "" {
 		model.Tag = s.NewTag
 	}
-
+	model.Status = s.Status
 	model.ProjectOpenstackId = s.ProjectOpenstackId
 	model.UpdateBy = s.UpdateBy // 添加这而，需要记录是被谁更新的
 }
 
 func (s *SysProjectUpdateReq) GetId() interface{} {
+	return s.ProjectId
+}
+
+// SysProjectPutUpdate 更新数据库
+type SysProjectPutUpdate struct {
+	ProjectId          int
+	ProjectName        string
+	ProjectOpenstackId string
+	Tag                string
+	Status             string
+}
+
+func (s *SysProjectPutUpdate) GetId() interface{} {
 	return s.ProjectId
 }
 

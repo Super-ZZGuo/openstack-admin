@@ -71,21 +71,24 @@ func (e *SysProject) Insert(c *dto.SysProjectInsertReq) error {
 }
 
 // Update 修改SysProject对象
-func (e *SysProject) Update(c *dto.SysProjectUpdateReq, p *actions.DataPermission) error {
+func (e *SysProject) Update(c *dto.SysProjectPutUpdate, p *actions.DataPermission) error {
 	var err error
-	var data = models.SysProject{}
-	e.Orm.Scopes(
-		actions.Permission(data.TableName(), p),
-	).First(&data, c.GetId())
-	c.Generate(&data)
-
-	db := e.Orm.Save(&data)
+	var model models.SysProject
+	db := e.Orm.Scopes(
+		actions.Permission(model.TableName(), p),
+	).First(&model, c.GetId())
 	if err = db.Error; err != nil {
-		e.Log.Errorf("SysProjectService Save error:%s \r\n", err)
+		e.Log.Errorf("Service Switch project status error: %s", err)
 		return err
 	}
 	if db.RowsAffected == 0 {
 		return errors.New("无权更新该数据")
+
+	}
+	err = e.Orm.Table(model.TableName()).Where("project_id =? ", c.ProjectId).Updates(c).Error
+	if err != nil {
+		e.Log.Errorf("Service UpdateSysImage path error: %s", err)
+		return err
 	}
 	return nil
 }
@@ -104,6 +107,25 @@ func (e *SysProject) Remove(d *dto.SysProjectDeleteReq, p *actions.DataPermissio
 	}
 	if db.RowsAffected == 0 {
 		return errors.New("无权删除该数据")
+	}
+	return nil
+}
+
+func (e *SysProject) GetRangePage(c *dto.SysRangeGetPageReq, p *actions.DataPermission, list *[]models.SysRange, count *int64) error {
+	var err error
+	var data models.SysRange
+
+	err = e.Orm.Model(&data).Preload("Project").
+		Scopes(
+			cDto.MakeCondition(c.GetNeedSearch()),
+			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
+			actions.Permission(data.TableName(), p),
+		).
+		Find(list).Limit(-1).Offset(-1).
+		Count(count).Error
+	if err != nil {
+		e.Log.Errorf("SysRangeService GetPage error:%s \r\n", err)
+		return err
 	}
 	return nil
 }

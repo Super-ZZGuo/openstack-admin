@@ -12,7 +12,8 @@ import (
 
 type SysProject struct {
 	ProjectId          int    `json:"projectId" gorm:"primaryKey;autoIncrement;comment:projectId"`
-	ProjectName        string `json:"projectName" gorm:"type:varchar(10);comment:ProjectName"`
+	ProjectName        string `json:"projectName" gorm:"type:varchar(100);comment:ProjectName"`
+	Status             string `json:"status" gorm:"type:varchar(10);comment:status"`
 	ProjectOpenstackId string `json:"projectOpenstackId" gorm:"type:varchar(100);comment:ProjectOpenstackId"`
 	Tag                string `json:"tag" gorm:"type:varchar(100);comment:tag"`
 	models.ModelTime
